@@ -1,0 +1,11 @@
+{
+    "touser": "OPENID",
+    "template_id": "gWKBKqiADnfJ7ePtcT-1CSeaHQMVwYG9J2rSwz7Kel0",
+    "url": "http://weixin.qq.com/download",
+    "data": {
+        "title": {
+            "value": "模板主题",
+            "color": "#173177"
+        }
+    }
+}
