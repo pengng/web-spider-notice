@@ -39,7 +39,9 @@ async function post(url, data) {
 async function getSubscribes() {
     const query = new URLSearchParams({ access_token: TOKEN })
     const body = await fetch(`https://api.weixin.qq.com/cgi-bin/user/get?${query}`)
-    const { data: { openid: list } } = JSON.parse(body)
+    const { errcode, errmsg, data: { openid: list } } = JSON.parse(body)
+    if (errcode) throw new Error(errmsg)
+
     return list
 }
 
@@ -67,6 +69,7 @@ function retryWrapper(fn, times = 3) {
             try {
                 return await fn.apply(this, arguments)
             } catch (e) {
+                console.error(e.message)
                 await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, i)))
             }
         }
@@ -113,7 +116,7 @@ async function* createProvider() {
     let index = 0
 
     while (true) {
-        if (list.length === 0) list = await providers[index++]()
+        if (list.length === 0) list = await providers[index++]().catch(() => [])
         index %= providers.length
         yield list.shift()
 
@@ -130,7 +133,7 @@ async function* createProvider() {
 
         if (Date.parse(date) < NOW || LIST.includes(url)) continue
 
-        await retryWrapper(notice)(title, url)
+        await retryWrapper(notice)(title, url).catch(Function.prototype)
         console.log(`${title} <${url}>`)
         LIST.push(url)
         await new Promise(resolve => setTimeout(resolve, 5000))
