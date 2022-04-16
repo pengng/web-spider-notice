@@ -89,9 +89,8 @@ async function website1() {
     return list
 }
 
-async function website2() {
+async function website2(urlpage) {
     console.log(`正在尝试抓取【深圳大学】公告`)
-    const urlpage = 'https://csse.szu.edu.cn/zk/menu/28/list'
 
     let result = await retryWrapper(fetch)(urlpage)
 
@@ -108,7 +107,8 @@ async function website2() {
 }
 
 async function* createProvider() {
-    const providers = [website1, website2]
+    const pages = ['https://csse.szu.edu.cn/zk/menu/29/list', 'https://csse.szu.edu.cn/zk/menu/28/list']
+    const providers = [website1, ...pages.map(url => website2.bind(null, url))]
     let list = []
     let index = 0
 
