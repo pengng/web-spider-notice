@@ -118,7 +118,8 @@ async function* createProvider() {
     while (true) {
         if (list.length === 0) list = await providers[index++]().catch(() => [])
         index %= providers.length
-        yield list.shift()
+
+        if (list.length) yield list.shift()
 
         if (list.length === 0 && index === 0) await new Promise(resolve => setTimeout(resolve, 1000 * 60 * 60))
     }
