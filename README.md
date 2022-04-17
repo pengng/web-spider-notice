@@ -10,6 +10,17 @@ npm install                             # 安装依赖的 npm 包
 npm start                               # 开始运行
 ```
 
+```shell
+> web-news-notice@1.0.0 start
+> node app.js
+
+正在尝试抓取【广东省教育考试院】公告
+广东省2022年重点高校招生专项计划具体实施区划公布 <https://eea.gd.gov.cn/ptgk/content/post_3913416.html>
+正在尝试抓取【广东省教育考试院】公告
+正在尝试抓取【深圳大学】公告
+正在尝试抓取【深圳大学】公告
+```
+
 ### 完成《广东省教育考试院》和《深圳大学》共4个通告列表页的2个数据采集器，相似页面可复用同一个采集器
 
 ```javascript
