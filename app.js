@@ -76,9 +76,9 @@ function retryWrapper(fn, times = 3) {
     }
 }
 
-async function website1() {
+async function website1(url) {
     console.log(`正在尝试抓取【广东省教育考试院】公告`)
-    let result = await retryWrapper(fetch)('https://eea.gd.gov.cn/zxks/index.html')
+    let result = await retryWrapper(fetch)(url)
 
     let $ = cheerio.load(result)
     let list = $('.main .content ul.list li')
@@ -92,16 +92,16 @@ async function website1() {
     return list
 }
 
-async function website2(urlpage) {
+async function website2(url) {
     console.log(`正在尝试抓取【深圳大学】公告`)
 
-    let result = await retryWrapper(fetch)(urlpage)
+    let result = await retryWrapper(fetch)(url)
 
     let $ = cheerio.load(result)
     let list = $('#content .articles ul li')
 
     list = Array.from(list).map(item => ({
-        url: String(Object.assign(new URL(urlpage), { pathname: $(item).find('a').attr('href') })),
+        url: String(Object.assign(new URL(url), { pathname: $(item).find('a').attr('href') })),
         title: $(item).find('a').text().replace('•', '').trim(),
         date: $(item).find('span.datetime').text().match(/\d{4}-\d{2}-\d{2}/).shift()
     }))
@@ -109,9 +109,7 @@ async function website2(urlpage) {
     return list
 }
 
-async function* createProvider() {
-    const pages = ['https://csse.szu.edu.cn/zk/menu/29/list', 'https://csse.szu.edu.cn/zk/menu/28/list']
-    const providers = [website1, ...pages.map(url => website2.bind(null, url))]
+async function* createProvider(providers) {
     let list = []
     let index = 0
 
@@ -130,7 +128,10 @@ async function* createProvider() {
 
     const NOW = new Date().setHours(0, 0, 0, 0)
 
-    for await (let { title, url, date } of createProvider()) {
+    const providers1 = ['https://eea.gd.gov.cn/ptgk/index.html', 'https://eea.gd.gov.cn/zxks/index.html'].map(website1.bind.bind(website1, null))
+    const providers2 = ['https://csse.szu.edu.cn/zk/menu/29/list', 'https://csse.szu.edu.cn/zk/menu/28/list'].map(website2.bind.bind(website2, null))
+
+    for await (let { title, url, date } of createProvider([...providers1, ...providers2])) {
 
         if (Date.parse(date) < NOW || LIST.includes(url)) continue
 
